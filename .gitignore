@@ -1,0 +1,7 @@
+*.tar.gz
+*.zip
+*.gz
+*.bam
+*.fastq
+*.fq
+*.fast5
