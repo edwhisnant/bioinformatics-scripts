@@ -1,12 +1,12 @@
 #!/usr/bin/bash
 
 #SBATCH --mem-per-cpu=3G   # Memory per CPU
-#SBATCH -c 18               # Number of threads per process
+#SBATCH -c 16               # Number of threads per process
 #SBATCH --output=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2/v25.09.29/logs/lecanoromyctes_%a.out
 #SBATCH --error=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2/v25.09.29/logs/lecanoromycetes_%a.err
 #SBATCH --partition=scavenger
 #SBATCH -t 15-00:00:00
-#SBATCH --array=8,16,18,29,30,41,42 # Array range (change after quality control step)
+#SBATCH --array=109 # Array range (change after quality control step)
 
 ################################################################################################
 #############                   RUNNING FUNANNOTATE2 PIPELINE                       ############

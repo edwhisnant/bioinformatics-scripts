@@ -8,8 +8,15 @@
 #SBATCH --array=200,400,600,800,1000,1200,1400,1600,1800,2000,2200,2400,2600 # Array range for filtering, 2807 is the max so you will feed the align directory directly
 #SBATCH -t 2-00:00:00
 #SBATCH --job-name=phyling-filter
-################################################################################################
 
+################################################################################################
+## === PHYling Filter Script ===
+## This script performs a filtering step after the MSA from phyling align. The input is the output directory from phyling align.
+## This module will quickly construct a tree for each MSA with fasttree and calculate the treeness/RCV value using PhyKIT.
+## Treeness/RCV is a measure of how informative a marker is and is a way of reducing bias in phylogenomic datasets.
+## Markers are ranked by their treeness/RCV value and the top N markers are selected for the final tree building step.
+## The output will be a directory containing the filtered markers for each value of N, which is fed into the next step (phyling tree)
+################################################################################################
 # Define variables
 OUTPUT=/hpc/group/bio1/ewhisnant/comp-genomics/compare/phyling/lecanoromycetes/v25.08.19/
 
