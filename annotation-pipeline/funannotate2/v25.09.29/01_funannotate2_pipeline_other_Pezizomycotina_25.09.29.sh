@@ -6,7 +6,7 @@
 #SBATCH --error=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2/v25.09.29/logs/pezizomycotina_%a.err
 #SBATCH --partition=scavenger
 #SBATCH -t 15-00:00:00
-#SBATCH --array=35,97 # Array range (change after quality control step)
+#SBATCH --array=0-279 # Array range (change after quality control step)
 
 ################################################################################################
 # NOTE 25.10.14:
@@ -26,6 +26,10 @@
 
 
 # === Recognizes taxonomy, but busco fails to search and download the lineage:
+# 4:06 PM 25.10.14: Re running these genomes manually assigning the lineage for the busco step
+# Thelobolales will use Leotiomycetes
+# asperigillaceae will use Eurotiales
+
 ### Thelebolales issues:
 # [211] Best busco lineage for Pseudogymnoascus_verrucosus_NCBI_GCA_001662655.1 is recognized as thelebolales, but busco fails to search and download the lineage. Returns `KeyError: 'thelebolales'`
 # [246] Best busco lineage for Thelebolus_globosus_JGI_Theglo1 is recognized as thelebolales, but busco fails to search and download the lineage. Returns `KeyError: 'thelebolales'`
@@ -38,6 +42,8 @@
 
 
 # === Fails after initial BUSCO pass
+# I have no idea how to workaround this issue.
+
 # [177] Ophiognomonia_clavigignenti-juglandacearum_NCBI_GCA_003013035.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps.
 # [24] Bathelium_albidoporum_NCBI_GCA_021031095.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Commonality with [177]: Both are using the augustus species [species=verticillium_longisporum1].
 # [268] Valsa_mali_NCBI_GCA_000818155.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Commonality with [177]: Both are using the sordariomycetes_odb12 lineage and in the Diaporthales.
@@ -68,6 +74,9 @@ OUTPUT=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2/v25.09.29/pezizomyco
 F2_INTERMEDIATE=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2/v25.09.29/f2-intermediate-files
 MASKED_DIR=${F2_INTERMEDIATE}/masked-genomes/other-pezizomycotina    # Directory for masked genomes
 CLEANED_DIR=${F2_INTERMEDIATE}/cleaned-genomes/other-pezizomycotina
+
+# This will normally be set to ${BASENAME}, but for the problematic genomes, we will manually set the species name to ensure busco works properly during the training module
+SPECIES=${BASENAME}
 
 ################################################################################################
 #############                    RUNNING A FILE CHECKPOINT                          ############
@@ -230,7 +239,7 @@ conda activate funannotate2
 funannotate2 train \
     -f ${SOFTMASKED_ASSEMBLY} \
     --cpus ${THREADS}  \
-    -s ${BASENAME} \
+    -s ${SPECIES} \
     -o ${OUTPUT}/${BASENAME}
 
 ###############################################################################################
