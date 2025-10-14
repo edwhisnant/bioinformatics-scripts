@@ -9,6 +9,31 @@
 #SBATCH --array=0-279 # Array range (change after quality control step)
 
 ################################################################################################
+# NOTE 25.10.14:
+# There is currently an issue with funannotate2 during the taxonmy lookup when busco is used 
+# in the training step. 260/276 genomes have completeted their annotations successfully. Below are
+# the remaining 16 genomes that are failing at various steps in the pipeline.
+
+# === From the error files, the following jobs are failing:
+# [150] Meliniomyces_bicolor_JGI_GCA_002865645.1. Fails to recognize taxonomy. Error occurs when `Getting taxonomy information` -- returns `false`
+# [152] Metacordyceps_chlamydosporia_JGI_Mchlamy1. Fails to recognize taxonomy. Error occurs when `Getting taxonomy information` -- returns `false`
+# [158]  Best busco lineage for Monascus_purpureus_NCBI_GCA_003184285.1 is recognized as asperigillaceae, but busco fails to search and download the lineage. Returns `KeyError: 'aspergillaceae'`
+# [159]  Best busco lineage for Monascus_ruber_NCBI_GCA_002976275.1 is recognized as asperigillaceae, but busco fails to search and download the lineage. Returns `KeyError: 'aspergillaceae'
+# [177] Unsure of what is causing the error for Ophiognomonia_clavigignenti-juglandacearum_NCBI_GCA_003013035.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps.
+# [183] Best busco lineage for Penicilliopsis_zonata_JGI_GCA_001890105.1 is recognized as asperigillaceae, but busco fails to search and download the lineage. Returns `KeyError: 'aspergillaceae'
+# [211] Best busco lineage for Pseudogymnoascus_verrucosus_NCBI_GCA_001662655.1 is recognized as thelebolales, but busco fails to search and download the lineage. Returns `KeyError: 'thelebolales'`
+# [246] Best busco lineage for Thelebolus_globosus_JGI_Theglo1 is recognized as thelebolales, but busco fails to search and download the lineage. Returns `KeyError: 'thelebolales'`
+# [24] Unsure of what is causing the error for Bathelium_albidoporum_NCBI_GCA_021031095.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Commonality with [177]: Both are using the augustus species [species=verticillium_longisporum1].
+# [268] Unsure of what is causing the error for Valsa_mali_NCBI_GCA_000818155.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Commonality with [177]: Both are using the sordariomycetes_odb12 lineage and in the Diaporthales.
+# [275] Best busco lineage for Xeromyces_bisporus_NCBI_GCA_900006255.1 is recognized as asperigillaceae, but busco fails to search and download the lineage. Returns `KeyError: 'aspergillaceae'
+# [35] Recognizing taxonomy for Byssochlamys_nivea_NCBI_GCA_003116535.1. Error occurs when `Getting taxonomy information` -- returns `false`
+# [39] Cairneyella_variabilis_NCBI_GCA_001625345.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Fails using [species=botrytis_cinerea]
+# [62] Clarireedia_homoeocarpa_NCBI_GCA_002242835.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Fails using [species=botrytis_cinerea]
+# [67] Colletotrichum_falcatum_NCBI_GCA_001484525.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Fails using [species=verticillium_longisporum1]
+# [97] Epibryaceae_sp_IL1160_Unpublished_NA. Fails to recognize taxonomy. Error occurs when `Getting taxonomy information` -- returns `false`
+
+
+################################################################################################
 #############                   RUNNING FUNANNOTATE2 PIPELINE                       ############
 ################################################################################################
 
