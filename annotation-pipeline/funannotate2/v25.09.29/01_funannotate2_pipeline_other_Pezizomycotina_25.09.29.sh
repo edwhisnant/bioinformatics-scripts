@@ -4,9 +4,9 @@
 #SBATCH -c 16               # Number of threads per process
 #SBATCH --output=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2/v25.09.29/logs/pezizomycotina_%a.out
 #SBATCH --error=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2/v25.09.29/logs/pezizomycotina_%a.err
-#SBATCH --partition=scavenger
+#SBATCH --partition=common
 #SBATCH -t 15-00:00:00
-#SBATCH --array=0-279 # Array range (change after quality control step)
+#SBATCH --array=24,177,246  # Array range (change after quality control step)
 
 ################################################################################################
 # NOTE 25.10.14:
@@ -24,7 +24,6 @@
 # [97] Epibryaceae_sp_IL1160_Unpublished_NA. Fails to recognize taxonomy. Error occurs when `Getting taxonomy information` -- returns `false` -- Eurotiomycetes
 
 
-
 # === Recognizes taxonomy, but busco fails to search and download the lineage:
 # 4:06 PM 25.10.14: Re running these genomes manually assigning the lineage for the busco step
 # Thelobolales will use Leotiomycetes
@@ -39,21 +38,88 @@
 # [183] Best busco lineage for Penicilliopsis_zonata_JGI_GCA_001890105.1 is recognized as asperigillaceae, but busco fails to search and download the lineage. Returns `KeyError: 'aspergillaceae'
 # [275] Best busco lineage for Xeromyces_bisporus_NCBI_GCA_900006255.1 is recognized as asperigillaceae, but busco fails to search and download the lineage. Returns `KeyError: 'aspergillaceae'
 
-
-
 # === Fails after initial BUSCO pass
 # I have no idea how to workaround this issue.
+# Maybe -- like the others -- manually assign the lineage?
+# 2:36 PM 25.10.15: Re running these genomes manually assigning taxonomy. The taxonomy used is the class of which the genomes are from.
 
+### Sordariomycetes
 # [177] Ophiognomonia_clavigignenti-juglandacearum_NCBI_GCA_003013035.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps.
-# [24] Bathelium_albidoporum_NCBI_GCA_021031095.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Commonality with [177]: Both are using the augustus species [species=verticillium_longisporum1].
 # [268] Valsa_mali_NCBI_GCA_000818155.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Commonality with [177]: Both are using the sordariomycetes_odb12 lineage and in the Diaporthales.
+# [67] Colletotrichum_falcatum_NCBI_GCA_001484525.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Fails using [species=verticillium_longisporum1]
+
+### Dothideomycetes
+# [24] Bathelium_albidoporum_NCBI_GCA_021031095.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Commonality with [177]: Both are using the augustus species [species=verticillium_longisporum1].
+
+### Leotiomycetes
 # [39] Cairneyella_variabilis_NCBI_GCA_001625345.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Fails using [species=botrytis_cinerea]
 # [62] Clarireedia_homoeocarpa_NCBI_GCA_002242835.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Fails using [species=botrytis_cinerea]
-# [67] Colletotrichum_falcatum_NCBI_GCA_001484525.1. Fails after the initial BUSCO pass, when miniprot is launched and augustus/pyhammer is run for remaining steps. Fails using [species=verticillium_longisporum1]
+
 
 
 # Potential workarounds:
 # When taxonomy is not being recognized, manually decide the best lineage.
+
+################################################################################################
+
+# NOTE 25.10.16
+
+# === Finished SUCCESSFULLY:
+# [35]
+# [97]
+# [268]
+# [67]
+# [275]
+# [211]
+# [183]
+# [159]
+# [158]
+# [152]
+# [150]
+# [39]
+# [62]
+
+
+# === Error seqkit command not found
+# 2:46 PM Re-running these genomes to get the mito and nuclear contigs in the correct format
+# DONE [275] Xeromyces_bisporus_NCBI_GCA_900006255.1. Annotation completed. Issue with seqkit splitting the mito and nuclear contigs.
+# DONE [183] Penicilliopsis_zonata_JGI_GCA_001890105.1. Annotation completed. Issue with seqkit splitting the mito and nuclear contigs.
+# DONE [159] Monascus_ruber_NCBI_GCA_002976275.1. Annotation completed. Issue with seqkit splitting the mito and nuclear contigs.
+# DONE [158] Monascus_purpureus_NCBI_GCA_003184285.1. Annotation completed. Issue with seqkit splitting the mito and nuclear contigs.
+# DONE [211] Pseudogymnoascus_verrucosus_NCBI_GCA_001662655.1. Annotation completed. Issue with seqkit splitting the mito and nuclear contigs.
+# DONE[150] Meliniomyces_bicolor_JGI_GCA_002865645.1. Annotation completed. Issue with seqkit splitting the mito and nuclear contigs.
+
+# === Error: issue with runbusco
+# 3:00 PM Re -running on the common server to see if this being caused by interruptions on the scavenger server
+# 3:30 PM -- Still failing. Option -- drop these genomes who are unable to be processed with funannotate2?
+
+### Use Leotiomycetes
+# [246] Thelebolus_globosus_JGI_Theglo1. runbusco issue kills predict.py when attempting to measure assembly completeness
+### use Sordariomycetes
+# [177] Ophiognomonia_clavigignenti-juglandacearum_NCBI_GCA_003013035.1. runbusco issue kills predict.py when attempting to measure assembly completeness
+### Use Dothideomycetes
+# [24] Bathelium_albidoporum_NCBI_GCA_021031095.1. runbusco issue kills predict.py when attempting to measure assembly completeness
+
+
+
+################################################################################################
+
+# NOTE 25.10.17
+# Installed the newest version of funannotate2 to try and fix some of the issues with runbusco
+
+# === Currently running but are taking ages to finish and seem to be stuck
+# [29] Biscogniauxia_simplicior_JGI_Bissi2. If it does not finish, I will drop it from the dataset.
+# [32] Bogoriella_megaspora_NCBI_GCA_026027345.1. If it does not finish, I will drop it from the dataset.
+
+# === With the new version of funannotate2, the following genomes will be re-run
+### Use Leotiomycetes
+# [246] Thelebolus_globosus_JGI_Theglo1
+### use Sordariomycetes
+# [177] Ophiognomonia_clavigignenti-juglandacearum_NCBI_GCA_003013035.1.
+### Use Dothideomycetes
+# [24] Bathelium_albidoporum_NCBI_GCA_021031095.1.
+
+
 
 ################################################################################################
 #############                   RUNNING FUNANNOTATE2 PIPELINE                       ############
@@ -77,7 +143,6 @@ CLEANED_DIR=${F2_INTERMEDIATE}/cleaned-genomes/other-pezizomycotina
 
 # This will normally be set to ${BASENAME}, but for the problematic genomes, we will manually set the species name to ensure busco works properly during the training module
 SPECIES=${BASENAME}
-
 ################################################################################################
 #############                    RUNNING A FILE CHECKPOINT                          ############
 ################################################################################################
@@ -86,8 +151,37 @@ SPECIES=${BASENAME}
 # HAS THE GENOME BEEN ANNOTATED ALREADY? IF SO, SKIP IT AND EXIT
 if [ -f "${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.gbk" ] && \
    [ -f "${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.proteins.fa" ]; then
-    echo "Genome ${BASENAME} has already been processed. Skipping."
-    exit 0
+    echo "Genome ${BASENAME} has likely already been processed. Checking for proper nuclear and mito separation."
+
+    # Check to see if renaming and mito splitting was done
+    # Checks to see if the .nuclear.fasta exists and is NOT empty
+    if [ -s "${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.nuclear.fasta" ] && \
+       [ -f "${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.mito.fasta" ]; then
+        echo "=== Renaming and mito splitting already completed for ${BASENAME}. Exiting."
+        exit 0
+    else
+        echo "=== Renaming and mito splitting not completed for ${BASENAME}. Continuing."
+
+        source $(conda info --base)/etc/profile.d/conda.sh
+        conda activate seqkit
+
+        echo "=== If mito DNA was identified, funannotate2 has edited the FASTA headers accordingly."
+
+        echo "=== Remaining mitochondrial contigs (if present) will be printed below:"
+        grep "mito" ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.fasta
+
+        echo "=== Separating newly identified mitochondrial contigs with seqkit (if present) ==="
+
+        seqkit grep -nvrip "mito" ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.fasta > ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.nuclear.fasta # Keeps only the nuclear DNA
+        seqkit grep -nrip "mito" ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.fasta > ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.mito.fasta # Keeps only the mito DNA
+
+        echo "=== Saved nuclear contigs to: ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.nuclear.fasta"
+        echo "=== Saved mito contigs to: ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.mito.fasta"
+
+        conda deactivate
+        exit 0
+    fi
+    
 fi
 
 # VALIDATE GFILE
@@ -300,7 +394,10 @@ echo "# 8. Splitting mito contigs: ${BASENAME}"
 ################################################################################################
 ############                          REMOVE MITO DNA                               ############
 ################################################################################################
-# Note 09.30.25: Need to see what the annotation is once the trial has finished running 
+ 
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate seqkit
+
 echo "=== If mito DNA was identified, funannotate2 has edited the FASTA headers accordingly."
 
 echo "=== Remaining mitochondrial contigs (if present) will be printed below:"
@@ -314,3 +411,4 @@ seqkit grep -nrip "mito" ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.fast
 echo "=== Saved nuclear contigs to: ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.nuclear.fasta"
 echo "=== Saved mito contigs to: ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.mito.fasta"
 
+conda deactivate

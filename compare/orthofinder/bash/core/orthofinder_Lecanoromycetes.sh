@@ -2,18 +2,29 @@
 
 #SBATCH --mem 500G  # adjust as needed
 #SBATCH -c 64 # Number of threads
-#SBATCH --output=/hpc/group/bio1/ewhisnant/comp-genomics/compare/logs/orthofinder/lecanoromycetes-v25.08.19.out
-#SBATCH --error=/hpc/group/bio1/ewhisnant/comp-genomics/compare/logs/orthofinder/lecanoromycetes-v25.08.19.err
+#SBATCH --output=/hpc/group/bio1/ewhisnant/comp-genomics/compare/logs/orthofinder/lecanoromycetes-v25.09.29.out
+#SBATCH --error=/hpc/group/bio1/ewhisnant/comp-genomics/compare/logs/orthofinder/lecanoromycetes-v25.09.29.err
 #SBATCH --partition=common
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=edw36@duke.edu
-#SBATCH --job-name=orthofinder-v25.08.19
-#SBATCH -t 7-00:00:00
+#SBATCH --job-name=orthofinder-v25.09.29
+#SBATCH -t 15-00:00:00
+##########################################################################################################
+# NOTES:
+
+# 25.10.20:
+# The phyling tree is being used in the OrthoFinder run to help guide orthogroup inference
+# This tree was generated using phyling 2.3.2. The output tree was re-rooted with Mesquite to place
+# the two genomes from Acarospora together, as the first diverging clade within the Lecanoromycetes.
+
+# Changing the method to diamond_ultra_sens for increased sensitivity in homology searches
+
+##########################################################################################################
 
 # === Define variables ===
-IN_DIR=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2-out/lecanoromycetes
-OUTPUT=/hpc/group/bio1/ewhisnant/comp-genomics/compare/orthofinder/lecanoromycetes/v25.08.19/
-PHYLING_TREE=/hpc/group/bio1/ewhisnant/comp-genomics/compare/phyling/lecanoromycetes/v25.08.19/consensus/2000-models/final_tree.nw
+IN_DIR=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2/v25.09.29/lecanoromycetes
+OUTPUT=/work/edw36/comp-genomics/compare/orthofinder/Pezizomycotina
+PHYLING_TREE=/work/edw36/comp-genomics/compare/phyling/lecanoromycetes/tree/consensus/Lecanoromycetes_final_tree_rerooted_v25.10.20.nwk
 PRIMARY_TRANSCRIPT_PY=/hpc/group/bio1/ewhisnant/miniconda3/envs/orthofinder/bin/primary_transcript.py
 
 cd ${IN_DIR}
@@ -22,7 +33,7 @@ cd ${IN_DIR}
 # rm -r ${OUTPUT}
 
 # Create a temporary directory for input files
-TEMP_DIR=$(mktemp -d /hpc/group/bio1/ewhisnant/comp-genomics/compare/orthofinder/temp-dir.XXXXXX)
+TEMP_DIR=$(mktemp -d /work/edw36/comp-genomics/compare/orthofinder/temp-dir.XXXXXX)
 
 # Find all protein FASTA files in the specified directory and copy them to the temporary directory
 echo "Copying protein FASTA files to temporary directory: ${TEMP_DIR}"
@@ -42,7 +53,7 @@ echo "Extracting the longest protein variant from each genome/proteome with `pri
 for f in ${TEMP_DIR}/*.proteins.fa ; do python3 ${PRIMARY_TRANSCRIPT_PY} $f ; done
 
 # Print the version of OrthoFinder being used
-orthofinder -v
+orthofinder -v # Should be OrthoFinder v3.1.0 or higher
 
 # Run OrthoFinder with the primary transcripts
 orthofinder \
@@ -52,17 +63,16 @@ orthofinder \
     -a 16 \
     -M msa \
     -A mafft \
-    -S diamond \
+    -S diamond_ultra_sens \
     -y \
     -s ${PHYLING_TREE} \
     -o ${OUTPUT}
 
 conda deactivate
 
-# Clean up the temporary directory
-echo "Cleaning up temporary directory: ${TEMP_DIR}"
-rm -rf ${TEMP_DIR}
-
+################################################################################################
+# To edit configuration file for dependencies:
+# /hpc/group/bio1/ewhisnant/miniconda3/envs/orthofinder/bin/src/orthofinder/run/config.json
 ################################################################################################
 # For help with OrthoFinder usage, see below
 ################################################################################################

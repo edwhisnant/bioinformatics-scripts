@@ -7,6 +7,11 @@
 #SBATCH --partition=scavenger
 #SBATCH -t 15-00:00:00
 #SBATCH --array=109 # Array range (change after quality control step)
+################################################################################################
+# NOTE 25.10.16:
+
+# === One more genome still running. 114/115 are complete.
+# [29] Gyalolechia_ehrenbergii_NCBI_GCA_023646125.1
 
 ################################################################################################
 #############                   RUNNING FUNANNOTATE2 PIPELINE                       ############
@@ -36,8 +41,36 @@ CLEANED_DIR=${F2_INTERMEDIATE}/cleaned-genomes/lecanoromycetes
 # HAS THE GENOME BEEN ANNOTATED ALREADY? IF SO, SKIP IT AND EXIT
 if [ -f "${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.gbk" ] && \
    [ -f "${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.proteins.fa" ]; then
-    echo "Genome ${BASENAME} has already been processed. Skipping."
-    exit 0
+    echo "Genome ${BASENAME} has likely already been processed. Checking for proper nuclear and mito separation."
+
+    # Check to see if renaming and mito splitting was done
+    if [ -s "${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.nuclear.fasta" ] && \
+       [ -f "${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.mito.fasta" ]; then
+        echo "=== Renaming and mito splitting already completed for ${BASENAME}. Exiting."
+        exit 0
+    else
+        echo "=== Renaming and mito splitting not completed for ${BASENAME}. Continuing."
+
+        source $(conda info --base)/etc/profile.d/conda.sh
+        conda activate seqkit
+
+        echo "=== If mito DNA was identified, funannotate2 has edited the FASTA headers accordingly."
+
+        echo "=== Remaining mitochondrial contigs (if present) will be printed below:"
+        grep "mito" ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.fasta
+
+        echo "=== Separating newly identified mitochondrial contigs with seqkit (if present) ==="
+
+        seqkit grep -nvrip "mito" ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.fasta > ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.nuclear.fasta # Keeps only the nuclear DNA
+        seqkit grep -nrip "mito" ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.fasta > ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.mito.fasta # Keeps only the mito DNA
+
+        echo "=== Saved nuclear contigs to: ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.nuclear.fasta"
+        echo "=== Saved mito contigs to: ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.mito.fasta"
+
+        conda deactivate
+        exit 0
+    fi
+    
 fi
 
 # VALIDATE GFILE
@@ -257,6 +290,9 @@ echo "# 8. Splitting mito contigs: ${BASENAME}"
 ############                          REMOVE MITO DNA                               ############
 ################################################################################################
 # Note 09.30.25: Need to see what the annotation is once the trial has finished running 
+source $(conda info --base)/etc/profile.d/conda.sh
+conda activate seqkit
+
 echo "=== If mito DNA was identified, funannotate2 has edited the FASTA headers accordingly."
 
 echo "=== Remaining mitochondrial contigs (if present) will be printed below:"
@@ -270,3 +306,4 @@ seqkit grep -nrip "mito" ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.fast
 echo "=== Saved nuclear contigs to: ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.nuclear.fasta"
 echo "=== Saved mito contigs to: ${OUTPUT}/${BASENAME}/annotate_results/${BASENAME}.mito.fasta"
 
+conda deactivate

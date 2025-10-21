@@ -2,8 +2,8 @@
 
 #SBATCH --mem-per-cpu=8G  # adjust as needed
 #SBATCH -c 32 # Number of threads per process
-#SBATCH --output=/hpc/group/bio1/ewhisnant/comp-genomics/compare/logs/phyling/tree/lecanoromycetes-tree-cons_%a.out
-#SBATCH --error=/hpc/group/bio1/ewhisnant/comp-genomics/compare/logs/phyling/tree/lecanoromycetes-tree-cons_%a.err
+#SBATCH --output=/hpc/group/bio1/ewhisnant/comp-genomics/compare/logs/phyling/pezizomycotina-tree.out
+#SBATCH --error=/hpc/group/bio1/ewhisnant/comp-genomics/compare/logs/phyling/pezizomycotina-tree.err
 #SBATCH --partition=scavenger
 #SBATCH -t 10-00:00:00
 #SBATCH --job-name=phyling-tree
@@ -25,7 +25,7 @@
 # Define variables
 CONCAT=yes # Set to "yes" if you want to concatenate the alignments for tree building, otherwise "no" or anything other than "yes"
 
-OUTPUT= # Adjust the path when ready to run
+OUTPUT=/work/edw36/comp-genomics/compare/phyling/all-pezizomycotina
 INDIR=${OUTPUT}/align
 TREE_DIR=${OUTPUT}/tree
 CONS_DIR=${TREE_DIR}/consensus
@@ -51,7 +51,7 @@ phyling tree \
     -f \
     --seqtype pep
 
-if [ "$CONCAT" = "yes" ]; then
+if [ "$CONCAT" == "yes" ]; then
     echo "You have chosen to concatenate the alignments for tree building"
     echo "# 2. Building a concatenated tree using all markers from the align step"
 

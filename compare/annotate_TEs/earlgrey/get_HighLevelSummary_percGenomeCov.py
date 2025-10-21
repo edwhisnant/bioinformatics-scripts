@@ -39,7 +39,8 @@ def load_md_table(filepath):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Summarize TE coverage from multiple .kable markdown tables prduced by EarlGrey."
+        description="Summarize TE coverage from multiple .kable markdown tables prduced by EarlGrey.",
+        epilog="Script written by Eric Whisnant [Duke University, Lutzoni Lab, v25.10.20]"
     )
     parser.add_argument(
         "--indir",
@@ -51,10 +52,16 @@ def main():
         required=True,
         help="Output directory where summary results (TSV + plot) will be saved"
     )
+    parser.add_argument(
+        "--name_prefix",
+        required=True,
+        help="The name that prefixes the output files (e.g., species name or strain ID)"
+    )
 
     args = parser.parse_args()
     indir = args.indir
     outdir = args.outdir
+    name = args.name_prefix
 
     os.makedirs(outdir, exist_ok=True)
 
@@ -75,10 +82,18 @@ def main():
     ).fillna(0)
 
     # Collapse duplicate TE columns if still present
-    df_wide = df_wide.groupby(level=0, axis=1).sum()
+    
+    # Move index into a column
+    df_wide = df_wide.reset_index()
+
+    # Clean up the names
+    df_wide['Genome'] = df_wide['Genome'].str.replace(r'\.highLevelCount$', '', regex=True)
+
+    #  Optionally move Genome back to be an index if you prefer
+    df_wide = df_wide.set_index('Genome')
 
     # === Save outputs ===
-    out_table = os.path.join(outdir, "TE_percent_coverage_wide.tsv")
+    out_table = os.path.join(outdir, name + "_TE_percent_coverage_wide.tsv")
     df_wide.to_csv(out_table, sep="\t")
     print(f"Saved summary table: {out_table}")
 
@@ -98,7 +113,7 @@ def main():
     plt.legend(title="TE Class", bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.tight_layout()
 
-    out_plot = os.path.join(outdir, "TE_percent_coverage_stacked_barplot.png")
+    out_plot = os.path.join(outdir, name + "_TE_stacked_barplot.png")
     plt.savefig(out_plot, dpi=300, bbox_inches="tight")
     print(f"Saved stacked bar plot: {out_plot}")
 

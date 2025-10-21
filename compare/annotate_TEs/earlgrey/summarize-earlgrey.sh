@@ -18,10 +18,10 @@ conda activate earlgrey_sum
 
 echo "#1. === Summarizing the Lecanoromycetes"
 mkdir -p ${OUTDIR_LECANO}
-python3 ${SUMMARY_PY} --indir ${INDIR_LECANO} --outdir ${OUTDIR_LECANO}
+python3 ${SUMMARY_PY} --indir ${INDIR_LECANO} --outdir ${OUTDIR_LECANO} --name_prefix Lecanoromycetes
 
-echo "#2. Summarizing the other Pezizomycotina"
+echo "#2. === Summarizing the other Pezizomycotina"
 mkdir -p ${OUTDIR_PEZIZO}
-python3 ${SUMMARY_PY} --indir ${INDIR_PEZIZO} --outdir ${OUTDIR_PEZIZO}
+python3 ${SUMMARY_PY} --indir ${INDIR_PEZIZO} --outdir ${OUTDIR_PEZIZO} --name_prefix Pezizomycotina
 
 conda deactivate

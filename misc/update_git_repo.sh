@@ -10,7 +10,7 @@ git add .
 git commit -m "Update on $(date '+%Y-%m-%d %H:%M:%S')" 
 
 # Pull remote changes to avoid conflicts
-git pull origin main
+git pull --rebase origin main
 
 # Push your changes
 git push origin main

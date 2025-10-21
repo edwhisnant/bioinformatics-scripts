@@ -13,13 +13,22 @@
 ## This module will extract single copy orthologs, perform MSA using MUSCLE, and trim the alignments using ClipKIT.
 ## The output will be a directory containing the aligned sequences for each marker, which can is fed into the next step (phyling tree or filter)
 ################################################################################################
+# NOTE:
+# 25.10.17: Running this script using the Lecanoromycetes protein fasta files from funannotate2 v25.09.29
+# Something is causing the alignment script to fail.
+
+# 6:28 PM Trying to re-install phyling in a fresh conda env to see if that helps
+
+
+
+################################################################################################
 
 # Define variables
-IN_DIR=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2-out/lecanoromycetes
-OUTPUT=/hpc/group/bio1/ewhisnant/comp-genomics/compare/phyling/lecanoromycetes/v25.08.19
+IN_DIR=/hpc/group/bio1/ewhisnant/comp-genomics/funannotate2/v25.09.29/lecanoromycetes
+OUTPUT=/work/edw36/comp-genomics/compare/phyling/lecanoromycetes
 
 # # Create a temporary directory for input files
-TEMP_DIR=$(mktemp -d /hpc/group/bio1/ewhisnant/comp-genomics/compare/phyling/temp-dir.XXXXXX)
+TEMP_DIR=$(mktemp -d /work/edw36/comp-genomics/compare/phyling/temp-dir.XXXXXX)
 
 # Find all protein FASTA files in the specified directory and copy them to the temporary directory
 echo "Copying protein FASTA files to temporary directory: ${TEMP_DIR}"
@@ -44,6 +53,7 @@ phyling align \
     -m ascomycota_odb12 \
     -M muscle \
     -t 32 \
+    -v \
     --seqtype pep
 
 conda deactivate
@@ -51,6 +61,8 @@ conda deactivate
 echo "You have two next steps to choose from:"
 echo "=== 1. Run the filtering step to select the best models for tree building (optional)"
 echo "=== 2. Run the tree building step directly using all models"
+echo "Remember to clean up temporary directory when done."
+
 
 ##############################
 # How to run phyling align:

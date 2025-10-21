@@ -6,9 +6,9 @@
 #SBATCH --error=/work/edw36/comp-genomics/quality-control/logs/busco/busco_%a.err
 #SBATCH --partition=scavenger
 #SBATCH -t 07:00:00      
-#SBATCH --array=0-289 # Array range
+#SBATCH --array=0-289%15 # Array range
 
-GENOMES=/hpc/group/bio1/ewhisnant/comp-genomics/genomes/ascomycota/select_pezizomycotina_25.09.24/raw
+GENOMES=/hpc/group/bio1/ewhisnant/comp-genomics/genomes/ascomycota/select_pezizomycotina_25.09.24/unmasked
 
 # Send output to work directory
 OUTPUT=/work/edw36/comp-genomics/quality-control/busco
